@@ -1,12 +1,10 @@
-$(document).ready(function () {
-
-const jumbtronEl = $("#jumbotronBox")
 const currentDateEl = $("#currentDay")
 const timeBlocksEl = $("#timeBlocks")
+const newDayPlanner = JSON.parse(localStorage.getItem("dayPlanner"))
 
 init();
 var dayPlanner = {
-    timeSlots: ["9AM", "10AM", "11AM", "12AM", "1PM", "2PM", "3PM", "4PM", "5PM"],
+    // timeSlots: ["9AM", "10AM", "11AM", "12AM", "1PM", "2PM", "3PM", "4PM", "5PM"],
     time: [9, 10, 11, 12, 13, 14, 15, 16, 17],
     listOfTask: [
         {
@@ -48,69 +46,64 @@ var dayPlanner = {
     ]
 }
 
-    function init() {
-        var currentDate = moment().format('dddd, MMMM Do');
-        currentDateEl.text(currentDate)
-        //saveDayPlanner();
+init();
+function init() {
+    var currentDate = moment().format('dddd, MMMM Do');
+    currentDateEl.text(currentDate)
+    checkLocalStorage();
+   // populateDayPlanner()
 }
 
-$.each(dayPlanner.timeSlots, function (index, item) {
-    var blockDiv = $("<div>")
-    blockDiv.addClass("row")
-    blockDiv.data("number", index)
-    var time = $("<h3>").addClass("col-3 hour").text(item)
-    time.data("number", item)
+function checkLocalStorage() {
 
-    var schedule = $("<input/>")
-    schedule.addClass("col-8")
+    if (newDayPlanner !== null) {
+        dayPlanner = newDayPlanner;
+    }
+
+    else {
+        saveDayPlanner()
+    }
+}
+
+$.each(dayPlanner.listOfTask, function (index, item) {
+    var blockDiv = $("<div>").addClass("row")
+    var time = $("<h3>").addClass("col-3 hour").text(item.workTime).data("timeSlot", item.workTime)
+
+
+    var schedule = $("<textarea/>").text(item.task).addClass("col-7").data("textAreaRow", index)
 
     if (dayPlanner.time[index] < moment().format("HH")) {
         schedule.addClass("past")
     }
     else if (dayPlanner.time[index] == moment().format("HH")) {
-    schedule.addClass("present")
-}
+        schedule.addClass("present")
+    }
 
-    else if(dayPlanner.time[index]>moment().format("HH")){
-    schedule.addClass("future")
-}
+    else if (dayPlanner.time[index] > moment().format("HH")) {
+        schedule.addClass("future")
+    }
 
-var saveButton = $("<button>")
-saveButton.addClass("col-1 saveBtn fa fa-save")
-saveButton.data("number", index + 1)
-
-saveButton.on("click", function () {
-onButtonClicks(time, schedule, saveButton);
-})
-
-blockDiv.append(time, schedule, saveButton)
-timeBlocksEl.append(blockDiv)
-
-populateDayPlanner(schedule);
+    var saveButton = $("<button>").addClass("col-2 saveBtn fa fa-save").data("saveButton", index + 1)
+    saveButton.on("click", function () {
+        init();
+        onButtonClicks(time, schedule, saveButton);
+    })
+    blockDiv.append(time, schedule, saveButton)
+    timeBlocksEl.append(blockDiv)
 
 })
 
 function onButtonClicks(time, schedule, saveButton) {
-
     event.preventDefault()
-    var onSaveButtonClicked = saveButton.data("number");
-    var getInputValue = schedule.val();
-    var getTime = time.data("number")
-    if (onSaveButtonClicked) {
-        dayPlanner.listOfTask.push(getInputValue)
+    if (saveButton.data("saveButton") - 1 === schedule.data("textAreaRow")) {
+        var textAreaIndex = schedule.data("textAreaRow");
+        dayPlanner.listOfTask[textAreaIndex].task = schedule.val();
+
+        saveDayPlanner();
+        populateDayPlanner(schedule);
     }
-
-    saveDayPlanner();
-
 }
 
-function saveDayPlanner(){
-
+function saveDayPlanner() {
     localStorage.setItem("dayPlanner", JSON.stringify(dayPlanner))
-
-    function populateDayPlanner(schedule) {
-        var newDayPlannerObject = JSON.parse(localStorage.getItem("dayPlanner"))
-        console.log(newDayPlannerObject.listOfTask[0])
-        schedule.val(newDayPlannerObject.listOfTask[0])
-    }
-});
+}
