@@ -1,15 +1,57 @@
+$(document).ready(function () {
+
 const jumbtronEl = $("#jumbotronBox")
 const currentDateEl = $("#currentDay")
 const timeBlocksEl = $("#timeBlocks")
 
 init();
-renderTimeBlock();
-
-function init() {
-    var gatDate = getTodaysDate();
-    jumbtronEl.text("hello day planner")
-    currentDateEl.text(gatDate)
+var dayPlanner = {
+    timeSlots: [9, 10, 11, 12, 1, 2, 3, 4, 5],
+    timeType: ["AM", "PM"],
+    listOfTask: [],
+    timeWithTimeType: function () {
+        var newTimeSlot = []
+        for (var i = 0; i < 4; i++) {
+            var newTimeAM = this.timeSlots[i] + this.timeType[0]
+            newTimeSlot.push(newTimeAM)
+        }
+        for (var j = 4; j < this.timeSlots.length; j++) {
+            var newTimePM = this.timeSlots[j] + this.timeType[1]
+            newTimeSlot.push(newTimePM)
+        }
+        console.log(newTimeSlot)
+        return newTimeSlot
+    }
 }
+
+$.each(dayPlanner.timeWithTimeType(), function (index, item) {
+    var blockDiv = $("<div>")
+    blockDiv.addClass("row")
+    blockDiv.data("number", index)
+    var time = $("<h3>").addClass("col-3 hour").text(item)
+    var schedule = $("<input>").addClass("col-8 future").data("number", index)
+
+    var saveButton = $("<button>")
+    saveButton.addClass("col-1 saveBtn fa fa-save")
+    saveButton.data("number", index)
+    console.log("I am save Button : " + saveButton.data("number"))
+    blockDiv.append(time, schedule, saveButton)
+    timeBlocksEl.append(blockDiv)
+
+
+})
+
+$(".saveBtn").each(function(event) {
+
+   // event.preventDefault()
+
+   // var getButtonValue = $("button").data("number");
+
+    console.log("inside save button clicked :"+$("button").data("number"))
+
+  //  localStorage.setItem("dayPlanner", JSON.stringify(dayPlanner))
+
+})
 
 function getTodaysDate() {
     var d = new Date();
@@ -43,7 +85,6 @@ function ordinal_suffix_of(i) {
 }
 
 
-
 function formatAMPM(date) {
     var hours = date.getHours();
     var ampm = hours >= 12 ? 'PM' : 'AM';
@@ -51,29 +92,18 @@ function formatAMPM(date) {
     hours = hours ? hours : 12; // the hour '0' should be '12'
     var strTime = hours  + ampm;
     return strTime;
-  }
+}
 
-function renderTimeBlock(event) {
+function getListOfAllDayPlanning() {
 
-
-    var times = ["9AM","10AM","11AM","12AM","1PM","2PM","3PM","4PM","5PM"]
-    var presentTime = formatAMPM(new Date)
-    times.forEach(function (item, index){
-    var blockDiv = $("<div>")
-    blockDiv.addClass("row")
-    var time = $("<h3>").addClass("col-2 hour").text(item)
-    console.log("item : "  +item + " index : "  +index)
-
-    console.log("present time : " +presentTime)
-
-    var schedule = $("<textarea>").addClass("col-8 ")
-
-    if(times[0] === "9AM"){
-        schedule.addClass("future")
-     }
-
-    var save = $("<button>").addClass("col-2 saveBtn fa fa-save")
-    blockDiv.append(time, schedule, save)
-    $("#timeBlocks").append(blockDiv)
-})
-} 
+    var messageZero = localStorage.getItem("storeMessageZero")
+    var messageOne = localStorage.getItem("storeMessageOne")
+    // var getDatAttribute = $("textarea");
+    // getDatAttribute = $(this).val();
+    // if(getDatAttribute==="0"){
+    //     console.log(getDatAttribute)
+    // $('textarea').html(messageZero)
+    // }
+    $('textarea').html(messageZero, messageOne)
+}
+});
