@@ -3,8 +3,8 @@ const timeBlocksEl = $("#timeBlocks")
 const newDayPlanner = JSON.parse(localStorage.getItem("dayPlanner"))
 
 init();
+// Creates a list of collections
 var dayPlanner = {
-    // timeSlots: ["9AM", "10AM", "11AM", "12AM", "1PM", "2PM", "3PM", "4PM", "5PM"],
     time: [9, 10, 11, 12, 13, 14, 15, 16, 17],
     listOfTask: [
         {
@@ -47,13 +47,14 @@ var dayPlanner = {
 }
 
 init();
+// Used moment to get the date
 function init() {
     var currentDate = moment().format('dddd, MMMM Do');
     currentDateEl.text(currentDate)
     checkLocalStorage();
-   // populateDayPlanner()
 }
 
+//Check local storage
 function checkLocalStorage() {
 
     if (newDayPlanner !== null) {
@@ -93,6 +94,7 @@ $.each(dayPlanner.listOfTask, function (index, item) {
 
 })
 
+//Compares the value of the text area and the saves on local storage
 function onButtonClicks(time, schedule, saveButton) {
     event.preventDefault()
     if (saveButton.data("saveButton") - 1 === schedule.data("textAreaRow")) {
@@ -104,6 +106,7 @@ function onButtonClicks(time, schedule, saveButton) {
     }
 }
 
+//Function to save to local storage
 function saveDayPlanner() {
     localStorage.setItem("dayPlanner", JSON.stringify(dayPlanner))
 }
